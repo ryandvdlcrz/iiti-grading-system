@@ -5,8 +5,8 @@ GET    /teachers               -> list of professors (read-only, used for the na
 POST   /teachers               -> old mock-only "Add Teacher" form
 DELETE /teachers/{teacher_id}  -> remove a teacher (mock-only)
 
-GET    /teacher-accounts       -> list of teacher login accounts (users collection, role "Teacher")
-POST   /teacher-accounts       -> "Create Account" form (professor + email + password)
+GET    /teacher-accounts       -> list of teacher login accounts (users collection, role "Teacher") [admin only]
+POST   /teacher-accounts       -> "Create Account" form (professor + email + password) [admin only]
 
 GET    /subjects               -> list of subjects
 POST   /subjects                -> "Add Subject" form
@@ -37,7 +37,7 @@ from app.models.grade import (
 )
 from app.services import mock_data, mongo_repo
 from app.database import get_db
-from app.auth.dependencies import get_current_teacher, CurrentTeacher
+from app.auth.dependencies import get_current_teacher, get_current_admin, CurrentTeacher
 
 router = APIRouter(tags=["admin"])
 
@@ -85,20 +85,17 @@ def delete_teacher(teacher_id: str, current_teacher: CurrentTeacher = Depends(ge
     )
 
 
-# --- Teacher accounts ---
-# TODO: restrict these two routes to admins once real auth exists. Like every
-# route in this file they only check the placeholder X-Teacher-Id header today,
-# so any caller who sends that header can create accounts.
+# --- Teacher accounts (admin only) ---
 
 @router.get("/teacher-accounts", response_model=list[TeacherAccount])
-def list_teacher_accounts(current_teacher: CurrentTeacher = Depends(get_current_teacher)):
+def list_teacher_accounts(current_admin: CurrentTeacher = Depends(get_current_admin)):
     if settings.USE_MOCK_DATA:
         return list(mock_data.MOCK_TEACHER_ACCOUNTS.values())
     return mongo_repo.list_teacher_accounts(get_db())
 
 
 @router.post("/teacher-accounts", response_model=TeacherAccount)
-def create_teacher_account(payload: TeacherAccountCreate, current_teacher: CurrentTeacher = Depends(get_current_teacher)):
+def create_teacher_account(payload: TeacherAccountCreate, current_admin: CurrentTeacher = Depends(get_current_admin)):
     email = payload.email.strip().lower()
     if "@" not in email or "." not in email.split("@")[-1]:
         raise HTTPException(status_code=400, detail="Enter a valid email address.")

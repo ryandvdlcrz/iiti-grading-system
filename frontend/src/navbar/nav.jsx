@@ -1,23 +1,23 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import IitiLogo from "../assets/navLogo/iitiLogo.png";
 import { IoIosNotifications } from "react-icons/io";
 import { FaBookBookmark } from "react-icons/fa6";
 
 import Notifications from "../notifications/notifications";
+import { authHeaders, clearSession } from "../auth/auth";
 
-// Same backend/auth constants used by grade.jsx and notifications.jsx
 const API_BASE = "http://localhost:8000";
-const TEACHER_ID = "6a71ae476300e08da083cd32";
 
 function nav() {
+  const navigate = useNavigate();
   const [showNotification, setShowNotification] = useState(false);
   const [hasUnread, setHasUnread] = useState(false);
 
   const checkUnread = useCallback(async () => {
     try {
       const response = await fetch(`${API_BASE}/notifications`, {
-        headers: { "x-teacher-id": TEACHER_ID },
+        headers: { ...authHeaders() },
       });
       if (!response.ok) return;
       const data = await response.json();
@@ -34,6 +34,11 @@ function nav() {
   const handleCloseNotifications = () => {
     setShowNotification(false);
     checkUnread(); // re-check in case something was marked as read
+  };
+
+  const handleLogout = () => {
+    clearSession();
+    navigate("/login", { replace: true });
   };
 
   return (
@@ -63,6 +68,16 @@ function nav() {
               <FaBookBookmark className="text-black bg-white p-0.5 w-6 h-6 rounded-md -ml-1" />
               <h1 className="font-medium mr-10">Grades</h1>
             </div>
+          </div>
+
+          {/*LOG OUT*/}
+          <div className="absolute bottom-6 left-6 right-6">
+            <button
+              onClick={handleLogout}
+              className="w-full flex justify-center p-2 rounded-xl border border-white/30 hover:bg-white/10 active:scale-95 transition-all"
+            >
+              <span className="font-medium">Log out</span>
+            </button>
           </div>
         </div>
       </aside>

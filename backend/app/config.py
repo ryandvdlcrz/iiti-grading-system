@@ -26,5 +26,10 @@ class Settings:
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "480"))
 
+    # TEMPORARY: while "true", requests with no login token but with the old
+    # X-Teacher-Id header are still accepted, so pages not yet switched to the
+    # token keep working. Set to "false" in .env once every page sends the token.
+    ALLOW_PLACEHOLDER_AUTH: bool = os.getenv("ALLOW_PLACEHOLDER_AUTH", "true").lower() == "true"
+
 
 settings = Settings()

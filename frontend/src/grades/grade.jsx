@@ -3,9 +3,9 @@ import { MdWavingHand } from "react-icons/md";
 import { FaSquare } from "react-icons/fa";
 import { LuDownload } from "react-icons/lu";
 import { FiUpload } from "react-icons/fi";
+import { authHeaders } from "../auth/auth";
 
 const API_BASE = "http://localhost:8000";
-const TEACHER_ID = "6a71ae476300e08da083cd32";
 
 // Raw term preview, computed from the admin-defined grade components
 // (label + percentage) instead of hardcoded weights.
@@ -73,7 +73,7 @@ function Grade() {
   useEffect(() => {
     async function fetchMe() {
       try {
-        const response = await fetch(`${API_BASE}/me`, { headers: { "x-teacher-id": TEACHER_ID } });
+        const response = await fetch(`${API_BASE}/me`, { headers: { ...authHeaders() } });
         if (!response.ok) throw new Error("Failed to load teacher profile");
         const data = await response.json();
         setTeacherName(data.full_name);
@@ -91,7 +91,7 @@ function Grade() {
       try {
         setAcademicTermsError(null);
         const response = await fetch(`${API_BASE}/sections/terms`, {
-          headers: { "x-teacher-id": TEACHER_ID },
+          headers: { ...authHeaders() },
         });
         if (!response.ok) throw new Error(`Failed to load terms (status ${response.status})`);
         const data = await response.json();
@@ -116,7 +116,7 @@ function Grade() {
         const { academic_year, semester } = decodeTermKey(selectedAcademicTerm);
         const params = new URLSearchParams({ academic_year, semester });
         const response = await fetch(`${API_BASE}/sections?${params.toString()}`, {
-          headers: { "x-teacher-id": TEACHER_ID },
+          headers: { ...authHeaders() },
         });
         if (!response.ok) throw new Error(`Failed to load sections (status ${response.status})`);
         const data = await response.json();
@@ -137,7 +137,7 @@ function Grade() {
       try {
         setComponentsError(null);
         const response = await fetch(`${API_BASE}/grade-components`, {
-          headers: { "x-teacher-id": TEACHER_ID },
+          headers: { ...authHeaders() },
         });
         if (!response.ok) throw new Error(`Failed to load grade components (status ${response.status})`);
         setGradeComponents(await response.json());
@@ -165,7 +165,7 @@ function Grade() {
       setRowsLoading(true);
       setRowsError(null);
       const response = await fetch(`${API_BASE}/sections/${selectedSectionId}/termgrades`, {
-        headers: { "x-teacher-id": TEACHER_ID },
+        headers: { ...authHeaders() },
       });
       if (!response.ok) throw new Error(`Failed to load grades (status ${response.status})`);
       const data = await response.json();
@@ -231,7 +231,7 @@ function Grade() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-teacher-id": TEACHER_ID,
+          ...authHeaders(),
         },
         body: JSON.stringify({
           term: termKey,
@@ -263,7 +263,7 @@ function Grade() {
     try {
       const response = await fetch(
         `${API_BASE}/sections/${selectedSectionId}/termgrades/csv?term=${termKey}`,
-        { headers: { "x-teacher-id": TEACHER_ID } }
+        { headers: { ...authHeaders() } }
       );
       if (!response.ok) throw new Error("Download failed.");
 
@@ -305,7 +305,7 @@ function Grade() {
       setSaveMessage(null);
       const response = await fetch(`${API_BASE}/sections/${selectedSectionId}/termgrades/csv`, {
         method: "POST",
-        headers: { "x-teacher-id": TEACHER_ID },
+        headers: { ...authHeaders() },
         body: formData,
       });
       if (!response.ok) {

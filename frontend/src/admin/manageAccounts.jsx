@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { authHeaders } from "../auth/auth";
 
 // Base URL for Python backend
 const API_BASE = "http://localhost:8000";
-
-// TEMPORARY placeholder auth header
-const TEACHER_ID = "test123";
 
 function ManageAccounts() {
   // --- Data fetched from backend ---
@@ -18,7 +16,7 @@ function ManageAccounts() {
       setLoading(true);
       setLoadError(null);
 
-      const headers = { "x-teacher-id": TEACHER_ID };
+      const headers = { ...authHeaders() };
 
       const [professorsRes, accountsRes] = await Promise.all([
         fetch(`${API_BASE}/teachers`, { headers }),
@@ -92,7 +90,7 @@ function ManageAccounts() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-teacher-id": TEACHER_ID,
+          ...authHeaders(),
         },
         body: JSON.stringify({
           professor_id: professor.id,

@@ -1,5 +1,4 @@
 // Keeps the logged-in session in the browser so a page refresh doesn't log you out.
-// The token isn't sent to the other API routes yet (next phase).
 
 const TOKEN_KEY = "auth_token";
 const USER_KEY = "auth_user";
@@ -29,4 +28,12 @@ export function clearSession() {
 // Where each role lands after logging in.
 export function homePathForRole(role) {
   return role === "Teacher" ? "/teacher" : "/admin";
+}
+
+// Spread this into the headers of every API call:
+//   headers: { ...authHeaders() }
+//   headers: { "Content-Type": "application/json", ...authHeaders() }
+export function authHeaders() {
+  const token = getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
 }

@@ -1,14 +1,22 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 import IitiLogo from "../assets/navLogo/iitiLogo.png";
+import { clearSession } from "../auth/auth";
 
 function NavAdmin() {
+  const navigate = useNavigate();
+
   const activeClass =
     "flex justify-center p-2 border border-white/30 rounded-xl bg-[#067309] drop-shadow-lg/25 active:scale-95";
 
   const inactiveClass =
     "flex justify-center p-2 rounded-xl hover:bg-white/10 active:scale-95 transition-all";
+
+  const handleLogout = () => {
+    clearSession();
+    navigate("/login", { replace: true });
+  };
 
   return (
     <aside className="font-RB text-white tracking-wide">
@@ -74,6 +82,16 @@ function NavAdmin() {
           >
             <h1 className="font-medium">View Grade</h1>
           </NavLink>
+        </div>
+
+        {/* Log out */}
+        <div className="absolute bottom-6 left-6 right-6">
+          <button
+            onClick={handleLogout}
+            className="w-full flex justify-center p-2 rounded-xl border border-white/30 hover:bg-white/10 active:scale-95 transition-all"
+          >
+            <span className="font-medium">Log out</span>
+          </button>
         </div>
       </div>
     </aside>
