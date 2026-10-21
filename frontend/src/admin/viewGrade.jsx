@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { FiSearch, FiDownload } from "react-icons/fi";
+import { authHeaders } from "../auth/auth";
 
 const API_BASE = "http://localhost:8000";
-const TEACHER_ID = "6a71ae476300e08da083cd32"; // placeholder admin identity, same as other admin pages
 
 const fmt = (v) => (v === null || v === undefined ? "—" : Number(v).toFixed(2));
 
@@ -53,7 +53,7 @@ function ViewGrade() {
         params.set("section", section);
       }
       const response = await fetch(`${API_BASE}/view-grades/filter-options?${params.toString()}`, {
-        headers: { "x-teacher-id": TEACHER_ID },
+        headers: { ...authHeaders() },
       });
       if (!response.ok) throw new Error(`Failed to load filters (status ${response.status})`);
       const data = await response.json();
@@ -118,7 +118,7 @@ function ViewGrade() {
       setHasSearched(true);
       const params = buildParams(mode);
       const response = await fetch(`${API_BASE}/view-grades?${params.toString()}`, {
-        headers: { "x-teacher-id": TEACHER_ID },
+        headers: { ...authHeaders() },
       });
       if (!response.ok) {
         const body = await response.json().catch(() => null);
@@ -160,7 +160,7 @@ function ViewGrade() {
     try {
       const params = buildParams(canSearchByClass ? "class" : "name");
       const response = await fetch(`${API_BASE}/view-grades/csv?${params.toString()}`, {
-        headers: { "x-teacher-id": TEACHER_ID },
+        headers: { ...authHeaders() },
       });
       if (!response.ok) throw new Error("Download failed.");
 

@@ -37,14 +37,14 @@ function NavAdmin() {
         {/* Navigation */}
         <div className="space-y-6 mt-16">
 
-          {/* Manage Subjects */}
+          {/* Manage Accounts */}
           <NavLink
-            to="/admin/manageSubject"
+            to="/admin/manage-accounts"
             className={({ isActive }) =>
               isActive ? activeClass : inactiveClass
             }
           >
-            <h1 className="font-medium">Manage Subjects</h1>
+            <h1 className="font-medium">Manage Accounts</h1>
           </NavLink>
 
           {/* Deadlines & Reminders */}
@@ -57,19 +57,13 @@ function NavAdmin() {
             <h1 className="font-medium">Deadlines & Reminders</h1>
           </NavLink>
 
-          {/* Manage Accounts */}
+          {/* Grade Components */}
           <NavLink
-            to="/admin/manage-accounts"
+            to="/admin/grade-components"
             className={({ isActive }) =>
               isActive ? activeClass : inactiveClass
             }
           >
-            <h1 className="font-medium">Manage Accounts</h1>
-          </NavLink>
-          <NavLink 
-          to="/admin/grade-components" 
-          className={({ isActive }) => (isActive ? activeClass : inactiveClass)
-          }>
             <h1 className="font-medium">Grade Components</h1>
           </NavLink>
 

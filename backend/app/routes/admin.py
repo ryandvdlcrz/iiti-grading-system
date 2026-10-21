@@ -1,5 +1,5 @@
 """
-Backend for the admin "Manage Teacher Accounts" and "Manage Subjects" pages.
+Backend for the admin "Manage Accounts" page.
 
 GET    /teachers               -> list of professors (read-only, used for the name suggestions)
 POST   /teachers               -> old mock-only "Add Teacher" form
@@ -8,17 +8,16 @@ DELETE /teachers/{teacher_id}  -> remove a teacher (mock-only)
 GET    /teacher-accounts       -> list of teacher login accounts (users collection, role "Teacher") [admin only]
 POST   /teacher-accounts       -> "Create Account" form (professor + email + password) [admin only]
 
-GET    /subjects               -> list of subjects
-POST   /subjects                -> "Add Subject" form
-DELETE /subjects/{subject_code} -> remove a subject
+GET    /assignments            -> teacher / subject / section pairings, read from schedules.classes
+POST   /assignments             -> mock-only
+DELETE /assignments/{assignment_id} -> mock-only
 
-GET    /assignments            -> list shown in the "Teacher Accounts" table
-POST   /assignments             -> "Assign" button
-DELETE /assignments/{assignment_id} -> X button next to an assignment row
+Subjects are no longer managed by this system, so there are no subject routes.
+Subject titles are still looked up (read-only) from the subjects collection
+when sections are listed.
 
-IMPORTANT: professors, subjects, and schedules in iiti_db are all owned by
-other systems/teams — even where a collection (like `subjects`) is
-currently empty, it's still not ours to populate. So in real mode:
+IMPORTANT: professors and schedules in iiti_db are owned by other
+systems/teams. In real mode:
   - GET requests read the real data (safe, read-only)
   - POST/DELETE (writes) are NOT implemented against real MongoDB — they
     stay mock-only until the owning team confirms it's safe to write here.
@@ -33,7 +32,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.config import settings
 from app.models.grade import (
     Teacher, TeacherCreate, TeacherAccount, TeacherAccountCreate,
-    Subject, SubjectCreate, Assignment, AssignmentCreate,
+    Assignment, AssignmentCreate,
 )
 from app.services import mock_data, mongo_repo
 from app.database import get_db
@@ -127,56 +126,7 @@ def create_teacher_account(payload: TeacherAccountCreate, current_admin: Current
         raise HTTPException(status_code=409, detail=str(e))
 
 
-# --- Subjects ---
-# Confirmed OK to write to real MongoDB — subjects collection is ours to
-# manage (unlike professors/schedules, which stay read-only).
-
-@router.get("/subjects", response_model=list[Subject])
-def list_subjects(current_teacher: CurrentTeacher = Depends(get_current_teacher)):
-    if settings.USE_MOCK_DATA:
-        return list(mock_data.MOCK_SUBJECTS.values())
-    return mongo_repo.list_subjects(get_db())
-
-
-@router.post("/subjects", response_model=Subject)
-def add_subject(payload: SubjectCreate, current_teacher: CurrentTeacher = Depends(get_current_teacher)):
-    code = payload.code.strip().upper()
-    title = payload.title.strip()
-
-    if not code or not title:
-        raise HTTPException(status_code=400, detail="Subject code and title are required.")
-
-    if settings.USE_MOCK_DATA:
-        if code in mock_data.MOCK_SUBJECTS:
-            raise HTTPException(status_code=409, detail=f"Subject '{code}' already exists.")
-        subject = Subject(code=code, title=title)
-        mock_data.MOCK_SUBJECTS[code] = subject
-        return subject
-
-    try:
-        return mongo_repo.add_subject(get_db(), code, title)
-    except ValueError as e:
-        raise HTTPException(status_code=409, detail=str(e))
-
-
-@router.delete("/subjects/{subject_code}")
-def delete_subject(subject_code: str, current_teacher: CurrentTeacher = Depends(get_current_teacher)):
-    if settings.USE_MOCK_DATA:
-        if subject_code not in mock_data.MOCK_SUBJECTS:
-            raise HTTPException(status_code=404, detail="Subject not found.")
-        del mock_data.MOCK_SUBJECTS[subject_code]
-        orphaned = [aid for aid, a in mock_data.MOCK_ASSIGNMENTS.items() if a.subject_code == subject_code]
-        for aid in orphaned:
-            del mock_data.MOCK_ASSIGNMENTS[aid]
-        return {"deleted": True, "subject_code": subject_code}
-
-    deleted = mongo_repo.delete_subject(get_db(), subject_code)
-    if not deleted:
-        raise HTTPException(status_code=404, detail="Subject not found.")
-    return {"deleted": True, "subject_code": subject_code}
-
-
-# --- Assignments (still fully mock — no safe real backing yet) ---
+# --- Assignments (read from schedules in real mode; writes are mock-only) ---
 
 @router.get("/assignments", response_model=list[Assignment])
 def list_assignments(current_teacher: CurrentTeacher = Depends(get_current_teacher)):

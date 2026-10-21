@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { authHeaders } from "../auth/auth";
 
 const API_BASE = "http://localhost:8000";
-const TEACHER_ID = "6a71ae476300e08da083cd32";
 
 function DeadlineAndReminders() {
   const terms = ["Prelim", "Midterm", "Pre-Final", "Final"];
@@ -16,7 +16,7 @@ function DeadlineAndReminders() {
   const fetchDeadlines = useCallback(async () => {
     try {
       const response = await fetch(`${API_BASE}/deadlines`, {
-        headers: { "x-teacher-id": TEACHER_ID },
+        headers: { ...authHeaders() },
       });
       if (!response.ok) throw new Error("Failed to load deadlines");
       const data = await response.json();
@@ -41,7 +41,7 @@ function DeadlineAndReminders() {
       setSaveMessage(null);
       const response = await fetch(`${API_BASE}/deadlines`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-teacher-id": TEACHER_ID },
+        headers: { "Content-Type": "application/json", ...authHeaders() },
         body: JSON.stringify({ term: selectedTerm, deadline_date: deadline }),
       });
       if (!response.ok) {
@@ -64,7 +64,7 @@ function DeadlineAndReminders() {
   const fetchReminderLog = useCallback(async () => {
     try {
       const response = await fetch(`${API_BASE}/reminders/log`, {
-        headers: { "x-teacher-id": TEACHER_ID },
+        headers: { ...authHeaders() },
       });
       if (!response.ok) throw new Error("Failed to load reminder log");
       const data = await response.json();
@@ -83,7 +83,7 @@ function DeadlineAndReminders() {
 
       const notifResponse = await fetch(`${API_BASE}/notifications`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-teacher-id": TEACHER_ID },
+        headers: { "Content-Type": "application/json", ...authHeaders() },
         body: JSON.stringify({
           message: `${selectedTerm} grades are due soon${deadline ? ` — please submit by ${deadline}` : ""}.`,
         }),
@@ -98,7 +98,7 @@ function DeadlineAndReminders() {
       try {
         await fetch(`${API_BASE}/reminders/send`, {
           method: "POST",
-          headers: { "Content-Type": "application/json", "x-teacher-id": TEACHER_ID },
+          headers: { "Content-Type": "application/json", ...authHeaders() },
           body: JSON.stringify({ term: selectedTerm }),
         });
         await fetchReminderLog();

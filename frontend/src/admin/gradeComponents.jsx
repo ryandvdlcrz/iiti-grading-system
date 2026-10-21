@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { authHeaders } from "../auth/auth";
 
 const API_BASE = "http://localhost:8000";
-const TEACHER_ID = "6a71ae476300e08da083cd32"; // placeholder admin identity, same as other admin pages
 
 function GradeComponents() {
   const [components, setComponents] = useState([]);
@@ -23,7 +23,7 @@ function GradeComponents() {
       setLoading(true);
       setLoadError(null);
       const response = await fetch(`${API_BASE}/grade-components`, {
-        headers: { "x-teacher-id": TEACHER_ID },
+        headers: { ...authHeaders() },
       });
       if (!response.ok) throw new Error(`Failed to load grade components (status ${response.status})`);
       const data = await response.json();
@@ -77,7 +77,7 @@ function GradeComponents() {
       setSavingId(component.id);
       const response = await fetch(`${API_BASE}/grade-components/${component.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", "x-teacher-id": TEACHER_ID },
+        headers: { "Content-Type": "application/json", ...authHeaders() },
         body: JSON.stringify({ label, percentage }),
       });
       if (!response.ok) {
@@ -96,7 +96,7 @@ function GradeComponents() {
     try {
       const response = await fetch(`${API_BASE}/grade-components/${component.id}`, {
         method: "DELETE",
-        headers: { "x-teacher-id": TEACHER_ID },
+        headers: { ...authHeaders() },
       });
       if (!response.ok) throw new Error(`Failed to remove component (status ${response.status})`);
       await fetchComponents();
@@ -123,7 +123,7 @@ function GradeComponents() {
       setAddError(null);
       const response = await fetch(`${API_BASE}/grade-components`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-teacher-id": TEACHER_ID },
+        headers: { "Content-Type": "application/json", ...authHeaders() },
         body: JSON.stringify({ label, percentage }),
       });
       if (!response.ok) {

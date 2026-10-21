@@ -3,7 +3,6 @@ import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import Nav from "./navbar/nav";
 import Grade from "./grades/grade";
 import Notifications from "./notifications/notifications";
-import ManageSubject from "./admin/manageSubject";
 
 import NavAdmin from "./navbar/navAdmin";
 import DeadlineAndReminders from "./admin/deadlineAndReminders";
@@ -15,7 +14,7 @@ import Login from "./login/login";
 import { getToken, getUser, homePathForRole } from "./auth/auth";
 
 // Front-end gate only: sends logged-out people to /login and keeps each role
-// on its own pages. The backend still has to enforce access (next phase).
+// on its own pages. The backend still has to enforce access.
 function RequireAuth({ role, children }) {
   const token = getToken();
   const user = getUser();
@@ -43,8 +42,8 @@ function App() {
 
         <Route path="/login" element={<Login />} />
 
-        {/* Redirect bare /admin to a default admin page */}
-        <Route path="/admin" element={<Navigate to="/admin/manageSubject" replace />} />
+        {/* Redirect bare /admin to the first admin page */}
+        <Route path="/admin" element={<Navigate to="/admin/manage-accounts" replace />} />
 
         {/* ===================== TEACHER ===================== */}
 
@@ -71,13 +70,13 @@ function App() {
 
         {/* ===================== ADMIN ===================== */}
 
-        {/* ADMIN Manage Subject */}
+        {/* ADMIN Manage Accounts */}
         <Route
-          path="/admin/manageSubject"
+          path="/admin/manage-accounts"
           element={
             <RequireAuth role="admin">
               <NavAdmin />
-              <ManageSubject />
+              <ManageAccounts />
             </RequireAuth>
           }
         />
@@ -89,17 +88,6 @@ function App() {
             <RequireAuth role="admin">
               <NavAdmin />
               <DeadlineAndReminders />
-            </RequireAuth>
-          }
-        />
-
-        {/* ADMIN Manage Accounts */}
-        <Route
-          path="/admin/manage-accounts"
-          element={
-            <RequireAuth role="admin">
-              <NavAdmin />
-              <ManageAccounts />
             </RequireAuth>
           }
         />

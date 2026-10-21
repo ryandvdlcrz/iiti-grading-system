@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react'
 import { GoDotFill } from "react-icons/go";
 
 import { IoIosCloseCircleOutline } from "react-icons/io";
+import { authHeaders } from "../auth/auth";
 
 // Base URL of the Python backend — same as grade.jsx
 const API_BASE = "http://localhost:8000";
-
-// TEMPORARY placeholder auth header, see app/auth/dependencies.py on the backend.
-const TEACHER_ID = "t1";
 
 function Notifications({ onClose }) {
   const [notifications, setNotifications] = useState([]);
@@ -21,7 +19,7 @@ function Notifications({ onClose }) {
         setLoadError(null);
 
         const response = await fetch(`${API_BASE}/notifications`, {
-          headers: { "x-teacher-id": TEACHER_ID },
+          headers: { ...authHeaders() },
         });
 
         if (!response.ok) {
@@ -53,7 +51,7 @@ function Notifications({ onClose }) {
         `${API_BASE}/notifications/${notification.id}/read`,
         {
           method: "POST",
-          headers: { "x-teacher-id": TEACHER_ID },
+          headers: { ...authHeaders() },
         }
       );
 
@@ -69,10 +67,11 @@ function Notifications({ onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40   flex font-RB items-center justify-center z-50">
-      <div className="bg-white w-fit   rounded-xl border-2 border-[#4E3404]/50 ">
+    <div className="fixed inset-0 bg-black/40 flex font-RB items-center justify-center z-50 p-4">
+      {/* The box never grows taller than the screen: the header stays put and only the list scrolls */}
+      <div className="bg-white w-fit max-w-full max-h-[85vh] flex flex-col overflow-hidden rounded-xl border-2 border-[#4E3404]/50">
 
-        <div className='flex justify-between  p-4 border-b-2 border-gray-300'>
+        <div className='flex justify-between p-4 border-b-2 border-gray-300 shrink-0'>
 
             <h1 className='text-black/50 '>NOTIFICATIONS</h1>
 
@@ -82,7 +81,7 @@ function Notifications({ onClose }) {
 
         </div>
         {/*Mensahe mula kay Rene */}
-        <div>
+        <div className="overflow-y-auto overscroll-contain min-h-0">
 
             {isLoading && (
               <p className="p-4 text-sm text-gray-400">Loading...</p>
@@ -110,7 +109,7 @@ function Notifications({ onClose }) {
                   />
                 </div>  
 
-                <div className=' border-b border-black/20 w-md'>
+                <div className=' border-b border-black/20 w-md max-w-full'>
                     <h2 className="font-semibold text-black">
                     {notification.message}
                     </h2>
