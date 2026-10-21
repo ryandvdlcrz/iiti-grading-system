@@ -13,6 +13,9 @@ import ViewGrade from "./admin/viewGrade";
 import Login from "./login/login";
 import { getToken, getUser, homePathForRole } from "./auth/auth";
 
+// Set VITE_APP_MODE=teacher in the deploy to leave the admin pages out (they live in the integrated system).
+const TEACHER_ONLY = import.meta.env.VITE_APP_MODE === "teacher";
+
 // Front-end gate only: sends logged-out people to /login and keeps each role
 // on its own pages. The backend still has to enforce access.
 function RequireAuth({ role, children }) {
@@ -43,7 +46,9 @@ function App() {
         <Route path="/login" element={<Login />} />
 
         {/* Redirect bare /admin to the first admin page */}
-        <Route path="/admin" element={<Navigate to="/admin/manage-accounts" replace />} />
+        {!TEACHER_ONLY && (
+          <Route path="/admin" element={<Navigate to="/admin/manage-accounts" replace />} />
+        )}
 
         {/* ===================== TEACHER ===================== */}
 
@@ -70,49 +75,54 @@ function App() {
 
         {/* ===================== ADMIN ===================== */}
 
-        {/* ADMIN Manage Accounts */}
-        <Route
-          path="/admin/manage-accounts"
-          element={
-            <RequireAuth role="admin">
-              <NavAdmin />
-              <ManageAccounts />
-            </RequireAuth>
-          }
-        />
+        {!TEACHER_ONLY && (
+          <>
 
-        {/* ADMIN Deadline And Reminders */}
-        <Route
-          path="/admin/deadlines"
-          element={
-            <RequireAuth role="admin">
-              <NavAdmin />
-              <DeadlineAndReminders />
-            </RequireAuth>
-          }
-        />
+            {/* ADMIN Manage Accounts */}
+            <Route
+              path="/admin/manage-accounts"
+              element={
+                <RequireAuth role="admin">
+                  <NavAdmin />
+                  <ManageAccounts />
+                </RequireAuth>
+              }
+            />
 
-        {/* ADMIN Grade Components */}
-        <Route
-          path="/admin/grade-components"
-          element={
-            <RequireAuth role="admin">
-              <NavAdmin />
-              <GradeComponents />
-            </RequireAuth>
-          }
-        />
+            {/* ADMIN Deadline And Reminders */}
+            <Route
+              path="/admin/deadlines"
+              element={
+                <RequireAuth role="admin">
+                  <NavAdmin />
+                  <DeadlineAndReminders />
+                </RequireAuth>
+              }
+            />
 
-        {/* ADMIN View Grade */}
-        <Route
-          path="/admin/view-grades"
-          element={
-            <RequireAuth role="admin">
-              <NavAdmin />
-              <ViewGrade />
-            </RequireAuth>
-          }
-        />
+            {/* ADMIN Grade Components */}
+            <Route
+              path="/admin/grade-components"
+              element={
+                <RequireAuth role="admin">
+                  <NavAdmin />
+                  <GradeComponents />
+                </RequireAuth>
+              }
+            />
+
+            {/* ADMIN View Grade */}
+            <Route
+              path="/admin/view-grades"
+              element={
+                <RequireAuth role="admin">
+                  <NavAdmin />
+                  <ViewGrade />
+                </RequireAuth>
+              }
+            />
+          </>
+        )}
 
         {/* Anything else goes back to login */}
         <Route path="*" element={<Navigate to="/login" replace />} />

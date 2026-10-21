@@ -7,7 +7,7 @@ import { FaBookBookmark } from "react-icons/fa6";
 import Notifications from "../notifications/notifications";
 import { authHeaders, clearSession } from "../auth/auth";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 function nav() {
   const navigate = useNavigate();

@@ -5,7 +5,7 @@ import { IoIosCloseCircleOutline } from "react-icons/io";
 import { authHeaders } from "../auth/auth";
 
 // Base URL of the Python backend — same as grade.jsx
-const API_BASE = "http://localhost:8000";
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 function Notifications({ onClose }) {
   const [notifications, setNotifications] = useState([]);

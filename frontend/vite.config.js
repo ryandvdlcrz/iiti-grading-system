@@ -5,5 +5,5 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss(),],
-  base: "/grading_System/",
+  base: process.env.VERCEL ? "/" : "/grading_System/",
 })

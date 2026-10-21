@@ -18,7 +18,7 @@ class Settings:
     # Flip to "false" in .env once studentportal schema is confirmed.
     USE_MOCK_DATA: bool = os.getenv("USE_MOCK_DATA", "true").lower() == "true"
 
-    CORS_ORIGINS: list[str] = os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
+    CORS_ORIGINS: list[str] = [o.strip() for o in os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",") if o.strip()]
 
     # Login tokens. SECRET_KEY has no default on purpose: login refuses to
     # work until you set a real one in .env.

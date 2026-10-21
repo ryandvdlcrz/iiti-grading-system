@@ -6,7 +6,7 @@ import { saveSession, getToken, getUser, homePathForRole } from "../auth/auth";
 import logo from "../assets/navLogo/iitiLogo.png";
 
 // Base URL for Python backend
-const API_BASE = "http://localhost:8000";
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 function Login() {
   const navigate = useNavigate();
@@ -45,6 +45,10 @@ function Login() {
         throw new Error(
           typeof detail === "string" ? detail : "Login failed. Please try again."
         );
+      }
+
+      if (import.meta.env.VITE_APP_MODE === "teacher" && body.user.role !== "Teacher") {
+        throw new Error("This site is for teacher accounts only.");
       }
 
       saveSession(body.access_token, body.user);

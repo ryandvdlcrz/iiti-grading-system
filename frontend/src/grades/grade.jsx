@@ -5,7 +5,7 @@ import { LuDownload } from "react-icons/lu";
 import { FiUpload } from "react-icons/fi";
 import { authHeaders } from "../auth/auth";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 // Raw term preview, computed from the admin-defined grade components
 // (label + percentage) instead of hardcoded weights.
