@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import IitiLogo from "../assets/navLogo/iitiLogo.png";
 import { IoIosNotifications } from "react-icons/io";
-import { FaBookBookmark } from "react-icons/fa6";
+import { FaBookBookmark, FaClipboardList } from "react-icons/fa6";
 
 import Notifications from "../notifications/notifications";
 import { authHeaders, clearSession } from "../auth/auth";
@@ -11,8 +11,17 @@ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 function nav() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [showNotification, setShowNotification] = useState(false);
   const [hasUnread, setHasUnread] = useState(false);
+
+  // Highlights the sidebar item that matches the current page
+  const navItemClass = (active) =>
+    `space-x-4 flex justify-center p-2 active:scale-95 cursor-pointer border-[0.5px] rounded-xl transition-all ${
+      active
+        ? "border-white/27 bg-[#067309] drop-shadow-lg/25"
+        : "border-transparent hover:bg-white/10"
+    }`;
 
   const checkUnread = useCallback(async () => {
     try {
@@ -62,11 +71,20 @@ function nav() {
           <div className="space-y-10 mt-20">
             {/*GRADE*/}
             <div
-              className="space-x-4  flex justify-center p-2 active:scale-95 cursor-pointer
-                             border-[0.5px] border-white/27 rounded-xl bg-[#067309] drop-shadow-lg/25"
+              onClick={() => navigate("/teacher")}
+              className={navItemClass(pathname === "/teacher")}
             >
               <FaBookBookmark className="text-black bg-white p-0.5 w-6 h-6 rounded-md -ml-1" />
               <h1 className="font-medium mr-10">Grades</h1>
+            </div>
+
+            {/*EVALUATION*/}
+            <div
+              onClick={() => navigate("/teacher/evaluation")}
+              className={navItemClass(pathname.startsWith("/teacher/evaluation"))}
+            >
+              <FaClipboardList className="text-black bg-white p-0.5 w-6 h-6 rounded-md -ml-1" />
+              <h1 className="font-medium mr-6">Evaluation</h1>
             </div>
           </div>
 

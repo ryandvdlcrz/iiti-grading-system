@@ -2,6 +2,7 @@ import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Nav from "./navbar/nav";
 import Grade from "./grades/grade";
+import Evaluation from "./evaluation/evaluation";
 import Notifications from "./notifications/notifications";
 
 import NavAdmin from "./navbar/navAdmin";
@@ -59,6 +60,17 @@ function App() {
             <RequireAuth role="teacher">
               <Nav />
               <Grade />
+            </RequireAuth>
+          }
+        />
+
+        {/* Teacher Evaluation (Self and Peer to Peer landing) */}
+        <Route
+          path="/teacher/evaluation"
+          element={
+            <RequireAuth role="teacher">
+              <Nav />
+              <Evaluation />
             </RequireAuth>
           }
         />
